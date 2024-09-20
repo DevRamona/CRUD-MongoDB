@@ -7,16 +7,26 @@ dotenv.config();
 const DATABASE_URL = process.env.DATABASE_URL;
 const bodyParser = require("body-parser");
 const User = require("./model/user");
-const BlogPost = require("./model/blogPost");
+
 const Comment = require("./model/comment");
+const blogRoutes = require("./routes/blogRoutes")
 
 app.use(express.json());
-// app.set('View engines', 'ejs')
-// app.render('index')
+app.set('view engine', 'ejs')
+
+
 app.get("/", (request, response) => {
-  console.log("Updated changes being applied");
-  response.send("Hello world");
+  response.render('index',{title: "Welcome to my blog"})
 });
+app.get("/about", (request, response) => {
+  response.render("about")
+})
+app.get("/404", (request, response) => {
+  response.render("404")
+})
+app.get("/create", (request, response) => {
+  response.render("create")
+})
 
 mongoose
   .connect(DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -41,7 +51,7 @@ app.post("/api/user/register", async (request, response) => {
 app.post("/api/user/login", async (request, response) => {
   const { username, password } = request.body;
   try {
-    const user = await User.findOne({ username,password });
+    const user = await User.findOne({ username, password });
 
     if (!user) {
       return response.status(500).json({ message: "User not found" });
@@ -51,52 +61,12 @@ app.post("/api/user/login", async (request, response) => {
     response.status(500).json(error.message);
   }
 });
+// blog routes
 
-app.post("/api/blog-post", async(request, response) => {
-    const{title,tag,content,author} = request.body
-    console.log(request.query)
-    try {
-      const blogPost=new BlogPost({title,author, tag, content})
-      console.log(request)
-      await blogPost.save()
-      response.status(200).json({blogPost})
-    }catch(error) {
-        response.status(500).json(error.message);
-    }
-}) 
-app.get("/api/blog-post", async(request, response) => {
-  const query = request.query
-  BlogPost.find(query).then((posts) => response.status(200).json(posts))
-  .catch((error) => {
-    response.status(500).json(error.message)
-  })
-})
-app.get("/api/blog-post/:id", async(request, response) => {
-  const {id} = request.params
-  BlogPost.findById(id).then((posts) => response.status(200).json(posts))
-  .catch((error) => {
-    response.status(500).json(error.message)
-  })
-  
-})
+app.use(blogRoutes)
 
-app.put("/api/blog-post/:id", async(request, response) => {
-  const {id} = request.params
-  BlogPost.findByIdAndUpdate(id, request.body, {new:true, overwrite:true}).then((posts) => response.status(200).json(posts))
-  .catch((error) => {
-    response.status(500).json(error.message)
-  })
-  
-})
-app.patch("/api/blog-post/:id", async(request, response) => {
-  const {id} = request.params
-  await BlogPost.findByIdAndUpdate(id, request.body, {new:true}).then((posts) => response.status(200).json(posts))
-  .catch((error) => {
-    response.status(500).json(error.message)
-  })
-  
-})
+const PORT = process.env.PORT || 3000
 
-app.listen(3000, () => {
-  console.log("Connected to localhost");
+app.listen(PORT, ()=> {
+  console.log(`Server is running on ${PORT}`)
 });
