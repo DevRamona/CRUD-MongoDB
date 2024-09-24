@@ -46,11 +46,21 @@ const postBlog = async (request, response) => {
         response.status(500).json(error.message);
       });
   }
+
+  const deleteBlogPost = async(request, response) => {
+    const{id} = request.params;
+    await BlogPost.findByIdAndDelete(id, request.body)
+    .then((post) => response.status(200).json(post))
+    .catch((error) => {
+      response.status(500).json(error.message);
+    })
+  }
   module.exports = {
     postBlog,
     getBlog,
     getBlogId,
     putBlogPost,
-    patchBlogPost
+    patchBlogPost,
+    deleteBlogPost
     
   } 

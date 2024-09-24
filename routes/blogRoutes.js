@@ -4,13 +4,15 @@ const {postBlog,
   getBlog,
   getBlogId,
   putBlogPost,
-  patchBlogPost} = require("./controllers/blogControllers")
-
-router.post("/api/blog-post",postBlog );
+  patchBlogPost, deleteBlogPost} = require("./controllers/blogControllers")
+const path = "/api/blog-post"
+router.post(path, postBlog );
 router.get("/blog-post",getBlog );
-router.get("/api/blog-post/:id", getBlogId );
+router.get(`${path}/id`, getBlogId );
 
-router.put("/api/blog-post/:id", putBlogPost );
-router.patch("/api/blog-post/:id",patchBlogPost );
+router.put(`${path}/id`, putBlogPost );
+router.patch(`${path}/id`,patchBlogPost );
+router.delete(`${path}/id`,deleteBlogPost );
+
 
 module.exports = router
